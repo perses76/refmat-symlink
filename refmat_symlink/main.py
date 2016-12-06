@@ -18,7 +18,8 @@ parser.add_argument(
 )
 
 
-REFMAT_SYMLINK_DB = os.path.join(os.path.abspath('..'), 'db')
+SOLUTION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+REFMAT_SYMLINK_DB = os.path.join(SOLUTION_DIR, 'db')
 
 
 def main():

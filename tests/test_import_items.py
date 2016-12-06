@@ -2,16 +2,19 @@ import os
 import unittest
 from unittest import mock
 from datetime import datetime
-import context
 from refmat_symlink.ref_mat import RefMat
+from refmat_symlink import config
+
+
+SOLUTION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
 
 class MainTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.ref_mat = RefMat(config=context.config)
+        self.config = config.Config(os.path.join(SOLUTION_DIR, '_db'))
+        self.ref_mat = RefMat(config=self.config)
         self.ref_mat.reset_db()
-        self.config = self.ref_mat.config
 
         self.tags = None
         self.files = None

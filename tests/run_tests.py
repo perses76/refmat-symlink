@@ -1,19 +1,15 @@
 import os
 import sys
 import unittest
-sys.path.insert(0, os.path.abspath('..'))
+
+SOLUTION_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+PROJECT_DIR = os.path.join(SOLUTION_DIR, 'refmat_symlink')
+TESTS_DIR = os.path.join(SOLUTION_DIR, 'tests')
+
+sys.path.insert(0, SOLUTION_DIR)
+sys.path.insert(0, PROJECT_DIR)
 
 
-PROJECT_DIR = os.path.abspath('..')
-
-
-from refmat_symlink import config
-import context
-
-
-context.config = config.Config(os.path.join(PROJECT_DIR, '_db'))
-
-
-suite = unittest.TestLoader().discover('.')
+suite = unittest.TestLoader().discover(TESTS_DIR)
 unittest.TextTestRunner().run(suite)
 print('End!')

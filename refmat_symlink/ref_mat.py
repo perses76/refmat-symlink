@@ -15,8 +15,7 @@ class RefMat(object):
         if os.path.exists(self.config.root):
             shutil.rmtree(self.config.root)
         os.makedirs(self.config.root)
-        os.makedirs(self.config.libraries_path)
-        os.makedirs(self.config.items_path)
+        os.makedirs(self.config.tags_path)
         os.makedirs(self.config.repository_path)
         os.makedirs(self.config.inbox_path)
 
