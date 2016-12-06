@@ -18,12 +18,8 @@ class Config(object):
         return self.__symling_manager
 
     @property
-    def libraries_path(self):
-        return os.path.join(self.root, 'Libraries')
-
-    @property
-    def items_path(self):
-        return os.path.join(self.root, 'Items')
+    def tags_path(self):
+        return os.path.join(self.root, 'Tags')
 
     @property
     def repository_path(self):
