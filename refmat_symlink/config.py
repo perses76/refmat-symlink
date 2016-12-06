@@ -1,5 +1,5 @@
 import os
-from .symlink_manager import SymlinkManager
+from symlink_manager import SymlinkManager
 
 
 class Config(object):

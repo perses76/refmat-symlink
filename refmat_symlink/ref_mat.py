@@ -22,6 +22,8 @@ class RefMat(object):
 
     def import_files(self, tags, files=None, info=None):
         item_paths = []
+        if files is None:
+            files = self.get_all_inbox_items()
         for fn in files:
             import_file = os.path.join(self.config.inbox_path, fn)
             item_path = self._import_file_to_repository(import_file)
@@ -41,6 +43,9 @@ class RefMat(object):
                 os.remove(import_file)
 
         return item_paths
+
+    def get_all_inbox_items(self):
+        return [fn for fn in os.listdir(self.config.inbox_path)]
 
     def _import_file_to_repository(self, file_name):
         folder = self._get_today_repository_folder()
