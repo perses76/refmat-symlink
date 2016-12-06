@@ -36,7 +36,7 @@ def main():
         for it in ref_mat.get_all_inbox_items():
             print(it)
         res = input('Are you sure? (Y/n)')
-        if res and res != 'Y':
+        if res and res.lower() != 'y':
             return
 
     ref_mat.import_files(
