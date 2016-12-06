@@ -2,21 +2,33 @@ import os
 
 
 class Config(object):
-    def __init__(self, root):
-        self.root = root
+    def __init__(self, root, symlink_manager=None):
+        self.__root = root
+        self.__symling_manager = symlink_manager
 
     @property
-    def db_path(self):
-        return self.root
+    def root(self):
+        return self.__root
+
+    @property
+    def symlink_manager(self):
+        if self.__symling_manager is None:
+            from symlink_manager import SymlinkManager
+            self.__symling_manager = SymlinkManager()
+        return self.__symling_manager
 
     @property
     def libraries_path(self):
-        return os.path.join(self.db_path, 'Libraries')
+        return os.path.join(self.root, 'Libraries')
 
     @property
-    def objects_path(self):
-        return os.path.join(self.db_path, 'Objects')
+    def items_path(self):
+        return os.path.join(self.root, 'Items')
 
     @property
-    def filesdb_path(self):
-        return os.path.join(self.db_path, 'FilesDB')
+    def repository_path(self):
+        return os.path.join(self.root, 'Repository')
+
+    @property
+    def inbox_path(self):
+        return os.path.join(self.root, 'Inbox')
