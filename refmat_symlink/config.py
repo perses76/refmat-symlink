@@ -1,4 +1,5 @@
 import os
+from .symlink_manager import SymlinkManager
 
 
 class Config(object):
@@ -13,7 +14,6 @@ class Config(object):
     @property
     def symlink_manager(self):
         if self.__symling_manager is None:
-            from symlink_manager import SymlinkManager
             self.__symling_manager = SymlinkManager()
         return self.__symling_manager
 

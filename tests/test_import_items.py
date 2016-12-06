@@ -11,58 +11,76 @@ class MainTestCase(unittest.TestCase):
     def setUp(self):
         self.ref_mat = RefMat(config=context.config)
         self.ref_mat.reset_db()
+        self.config = self.ref_mat.config
 
-    def assert_file_exists(self, path):
-        self.assertTrue(
-            os.path.exists(os.path.join(self.config.root, path)),
-            'File does not exists: {}'.format(os.path.join(self.config.root, path))
-        )
+        self.tags = None
+        self.files = None
+        self.today_datetime = datetime(2015, 6, 1, 18, 45, 23)
 
-    def assert_file_not_exists(self, path):
-        self.assertFalse(
-            os.path.exists(os.path.join(self.config.root, path))
-        )
+        self.expeted_repository_path = None
 
-    @mock.patch('refmat_symlink.ref_mat.now')
-    def test_import_file(self, now_mock):
-        ref_mat = self.ref_mat
-        self.config = ref_mat.config
+    def call_target(self):
+        with mock.patch('refmat_symlink.ref_mat.now') as m:
+            m.return_value = self.today_datetime
+            self.ref_mat.import_files(
+                files=self.files,
+                tags=self.tags
+            )
+            self.expeted_repository_path = os.path.join(self.today_datetime.strftime('%Y%m'), self.today_datetime.strftime('%d'))
+
+    def assert_files_does_not_exists_in_inbox(self):
+        for file_name in self.files:
+            self.assert_file_not_exists(self.config.inbox_path, file_name)
+
+    def assert_files_exists_in_tags(self):
+        for tag in self.tags:
+            for file_name in self.files:
+                self.assert_file_exists(tag, file_name)
+
+    def assert_files_in_repository_exist(self):
+        for file_name in self.files:
+            self.assert_file_exists(self.config.repository_path, self.expeted_repository_path, file_name)
+
+    def assert_file_exists(self, *path):
+        full_path = os.path.join(self.config.root, *path)
+        self.assertTrue(os.path.exists(full_path), 'File does not exists: {}'.format(full_path))
+
+    def assert_file_not_exists(self, *path):
+        full_path = os.path.join(self.config.root, *path)
+        self.assertFalse(os.path.exists(full_path), 'File exists: {}'.format(full_path))
+
+    def create_item_in_inbox(self, item_name):
+        with open(os.path.join(self.config.inbox_path, item_name), 'w+') as f:
+            f.write('file_content')
+
+    def test_import_file(self):
         test_filename = 'test.txt'
-        test_filecontent = 'my test'
-        library_name = 'mylib'
-        item_name = 'myittem'
-        with open(os.path.join(ref_mat.config.inbox_path, test_filename), 'w+') as f:
-            f.write(test_filecontent)
-        today_datetime = datetime(2015, 6, 1, 18, 45, 23)
-        now_mock.return_value = today_datetime
+        self.create_item_in_inbox(test_filename)
+        self.today_datetime = datetime(2014, 6, 1, 18, 45, 23)
 
-        ref_mat.import_files(
-            files=[test_filename],
-            libraries=[library_name],
-            items=[item_name]
-        )
-        self.assert_file_exists(os.path.join(self.config.repository_path, '201506', '01', test_filename))
-        self.assert_file_exists(os.path.join(ref_mat.config.libraries_path, library_name, test_filename))
-        self.assert_file_exists(os.path.join(ref_mat.config.items_path, item_name, test_filename))
-        self.assert_file_not_exists(os.path.join(ref_mat.config.inbox_path, test_filename))
+        self.files = [test_filename]
+        self.tags = [
+            os.path.join('libs', 'mylib'),
+            os.path.join('subjects', 'mysubj')
+        ]
 
-    @mock.patch('refmat_symlink.ref_mat.now')
-    def test_import_folder(self, now_mock):
-        ref_mat = self.ref_mat
-        self.config = ref_mat.config
+        self.call_target()
+
+        self.assert_files_in_repository_exist()
+        self.assert_files_exists_in_tags()
+        self.assert_files_does_not_exists_in_inbox()
+
+    def test_import_folder(self):
         test_foldername = 'test.txt'
-        library_name = 'mylib'
-        item_name = 'myittem'
-        os.makedirs(os.path.join(ref_mat.config.inbox_path, test_foldername))
-        today_datetime = datetime(2015, 6, 1, 18, 45, 23)
-        now_mock.return_value = today_datetime
+        os.makedirs(os.path.join(self.config.inbox_path, test_foldername))
 
-        ref_mat.import_files(
-            files=[test_foldername],
-            libraries=[library_name],
-            items=[item_name]
-        )
-        self.assert_file_exists(os.path.join(self.config.repository_path, '201506', '01', test_foldername))
-        self.assert_file_exists(os.path.join(ref_mat.config.libraries_path, library_name, test_foldername))
-        self.assert_file_exists(os.path.join(ref_mat.config.items_path, item_name, test_foldername))
-        self.assert_file_not_exists(os.path.join(ref_mat.config.inbox_path, test_foldername))
+        self.files = [test_foldername]
+        self.tags = [
+            os.path.join('libs', 'mylib'),
+            os.path.join('subjects', 'mysubj')
+        ]
+        self.call_target()
+
+        self.assert_files_in_repository_exist()
+        self.assert_files_exists_in_tags()
+        self.assert_files_does_not_exists_in_inbox()

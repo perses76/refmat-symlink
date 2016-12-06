@@ -20,29 +20,27 @@ class RefMat(object):
         os.makedirs(self.config.repository_path)
         os.makedirs(self.config.inbox_path)
 
-    def import_files(self, files, libraries, items, for_bakup=False, info=None):
+    def import_files(self, tags, files=None, info=None):
         item_paths = []
         for fn in files:
             import_file = os.path.join(self.config.inbox_path, fn)
             item_path = self._import_file_to_repository(import_file)
-            self._link_file(item_path, fn, libraries, self.config.libraries_path)
-            self._link_file(item_path, fn, items, self.config.items_path)
+            for tag in tags:
+                self.config.symlink_manager.create_symlink(
+                    source=item_path,
+                    target=os.path.join(
+                        self._get_or_create_folder(self.config.root, tag),
+                        fn
+                    ),
+                )
+
             item_paths.append(item_path)
             if os.path.isdir(import_file):
                 shutil.rmtree(import_file)
             else:
                 os.remove(import_file)
-        return item_paths
 
-    def _link_file(self, item_path, filename, folders, root):
-            for folder in folders:
-                self.config.symlink_manager.create_symlink(
-                    source=item_path,
-                    target=os.path.join(
-                        self._get_or_create_folder(root, folder),
-                        filename
-                    ),
-                )
+        return item_paths
 
     def _import_file_to_repository(self, file_name):
         folder = self._get_today_repository_folder()
@@ -68,12 +66,3 @@ class RefMat(object):
             if not os.path.exists(path):
                 os.makedirs(path)
         return path
-
-    def get_library_path(self, library):
-        raise NotImplementedError()
-
-    def get_object_path(self, object_name):
-        raise NotImplementedError()
-
-    def get_back_path(self, library):
-        raise NotImplementedError()
