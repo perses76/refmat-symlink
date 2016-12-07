@@ -14,7 +14,7 @@ class MainTestCase(unittest.TestCase):
     def setUp(self):
         self.config = config.Config(os.path.join(SOLUTION_DIR, '_db'))
         self.ref_mat = RefMat(config=self.config)
-        self.ref_mat.reset_db()
+        self.ref_mat.initializedb()
 
         self.tags = None
         self.files = None
@@ -46,7 +46,7 @@ class MainTestCase(unittest.TestCase):
     def assert_files_exists_in_tags(self):
         for tag in self.tags:
             for file_name in self.expected_files:
-                self.assert_file_exists(tag, file_name)
+                self.assert_file_exists(self.config.tags_path, tag, file_name)
 
     def assert_files_in_repository_exist(self):
         for file_name in self.expected_files:

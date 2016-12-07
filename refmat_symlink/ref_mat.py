@@ -24,7 +24,7 @@ class RefMat(object):
                 self.config.symlink_manager.create_symlink(
                     source=item_path,
                     target=os.path.join(
-                        self._get_or_create_folder(self.config.root, tag),
+                        self._get_or_create_folder(self.config.tags_path, tag),
                         fn
                     ),
                 )
