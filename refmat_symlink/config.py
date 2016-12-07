@@ -23,7 +23,7 @@ class Config(object):
 
     @property
     def repository_path(self):
-        return os.path.join(self.root, 'Repository')
+        return os.path.join(self.root, 'Repo')
 
     @property
     def inbox_path(self):

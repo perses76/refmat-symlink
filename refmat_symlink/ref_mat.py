@@ -8,18 +8,12 @@ now = datetime.now
 class RefMat(object):
     def __init__(self, config=None, symlink_manager=None):
         self.config = config
-        if not os.path.exists(config.root):
-            self.reset_db()
 
-    def reset_db(self):
-        if os.path.exists(self.config.root):
-            shutil.rmtree(self.config.root)
-        os.makedirs(self.config.root)
-        os.makedirs(self.config.tags_path)
-        os.makedirs(self.config.repository_path)
-        os.makedirs(self.config.inbox_path)
+    def initializedb(self):
+        self._reset_db()
 
     def import_files(self, tags, files=None, info=None):
+        self._assert_db_exists()
         item_paths = []
         if files is None:
             files = self.get_all_inbox_items()
@@ -44,7 +38,23 @@ class RefMat(object):
         return item_paths
 
     def get_all_inbox_items(self):
+        self._assert_db_exists()
         return [fn for fn in os.listdir(self.config.inbox_path)]
+
+    def _assert_db_exists(self):
+        if not self.is_db_initialized():
+            raise ValueError('Refmat DB is not initialized')
+
+    def _reset_db(self):
+        if os.path.exists(self.config.root):
+            shutil.rmtree(self.config.root)
+        os.makedirs(self.config.root)
+        os.makedirs(self.config.tags_path)
+        os.makedirs(self.config.repository_path)
+        os.makedirs(self.config.inbox_path)
+
+    def is_db_initialized(self):
+        return os.path.exists(self.config.root)
 
     def _import_file_to_repository(self, file_name):
         folder = self._get_today_repository_folder()
